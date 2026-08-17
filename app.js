@@ -925,33 +925,61 @@ async function fetchBookByISBN(isbn) {
       const bookData = data[bookKey];
       console.log('Book found:', bookData.title);
       
-      // Add modal is already open, just fill the fields
-      hideLoading();
-      
       // Fill form with fetched data
+      hideLoading();
       document.getElementById('book-title').value = bookData.title || '';
       document.getElementById('book-author').value = bookData.authors ? bookData.authors.map(a => a.name).join(', ') : '';
+      document.getElementById('book-isbn').value = isbn;
       
-      // Set cover image
+      // Auto-download cover image
+      let coverUrl = null;
       if (bookData.cover) {
-        const coverUrl = bookData.cover.large || bookData.cover.medium || bookData.cover.small;
+        coverUrl = bookData.cover.large || bookData.cover.medium || bookData.cover.small;
+      }
+      
+      // Fallback: try Open Library covers API
+      if (!coverUrl) {
+        coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+      }
+      
+      if (coverUrl) {
         document.getElementById('book-cover-url').value = coverUrl;
         showPreview('cover-preview', coverUrl);
+        
+        // Auto-download cover as data URL for offline use
+        try {
+          const imgResponse = await fetch(coverUrl);
+          if (imgResponse.ok) {
+            const blob = await imgResponse.blob();
+            const reader = new FileReader();
+            reader.onload = () => {
+              window._capturedCoverImage = reader.result;
+              document.getElementById('book-cover-url').value = '';
+              showPreview('cover-preview', reader.result);
+            };
+            reader.readAsDataURL(blob);
+          }
+        } catch (imgErr) {
+          console.log('Could not download cover, using URL:', imgErr);
+          // Keep the URL as-is
+        }
       }
+      
+      // Set orientation to cover since we have one
+      document.querySelectorAll('.btn-orientation').forEach(b => b.classList.remove('active'));
+      document.querySelector('.btn-orientation[data-orientation="cover"]').classList.add('active');
+      
     } else {
       console.log('Not found in primary API, trying alternative...');
-      // Try alternative API endpoint
       await fetchBookByISBNAlternative(isbn);
     }
   } catch (error) {
     console.error('Open Library error:', error);
-    // Try alternative before giving up
     try {
       await fetchBookByISBNAlternative(isbn);
     } catch (err2) {
       console.error('Alternative also failed:', err2);
       hideLoading();
-      openAddModal();
       document.getElementById('book-isbn').value = isbn;
     }
   }
@@ -964,10 +992,9 @@ async function fetchBookByISBNAlternative(isbn) {
     if (response.ok) {
       const data = await response.json();
       
-      // Add modal is already open, just fill the fields
       hideLoading();
-      
       document.getElementById('book-title').value = data.title || '';
+      document.getElementById('book-isbn').value = isbn;
       
       // Try to get author
       if (data.authors && data.authors.length > 0) {
@@ -979,17 +1006,38 @@ async function fetchBookByISBNAlternative(isbn) {
         }
       }
       
-      // Get cover from Open Library covers API
+      // Auto-download cover
       const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
       document.getElementById('book-cover-url').value = coverUrl;
       showPreview('cover-preview', coverUrl);
+      
+      try {
+        const imgResponse = await fetch(coverUrl);
+        if (imgResponse.ok) {
+          const blob = await imgResponse.blob();
+          const reader = new FileReader();
+          reader.onload = () => {
+            window._capturedCoverImage = reader.result;
+            document.getElementById('book-cover-url').value = '';
+            showPreview('cover-preview', reader.result);
+          };
+          reader.readAsDataURL(blob);
+        }
+      } catch (imgErr) {
+        console.log('Could not download cover:', imgErr);
+      }
+      
+      // Set orientation to cover
+      document.querySelectorAll('.btn-orientation').forEach(b => b.classList.remove('active'));
+      document.querySelector('.btn-orientation[data-orientation="cover"]').classList.add('active');
+      
     } else {
       throw new Error('Not found');
     }
   } catch (error) {
     console.error('Alternative fetch error:', error);
     hideLoading();
-    // ISBN is already filled, user can complete manually
+    document.getElementById('book-isbn').value = isbn;
   }
 }
 
