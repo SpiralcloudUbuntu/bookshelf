@@ -10,8 +10,46 @@ let html5QrCode = null;
 async function init() {
   await db.init();
   AppSettings.init();
+  FirebaseSync.init();
   renderBookshelf();
   setupEventListeners();
+}
+
+// Login modal
+function showLoginModal() {
+  document.getElementById('modal-login').classList.remove('hidden');
+}
+
+function hideLoginModal() {
+  document.getElementById('modal-login').classList.add('hidden');
+}
+
+async function handleGoogleLogin() {
+  try {
+    await FirebaseSync.signInWithGoogle();
+    hideLoginModal();
+  } catch (error) {
+    alert('Error al iniciar sesión: ' + error.message);
+  }
+}
+
+async function handleEmailLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  
+  try {
+    await FirebaseSync.signInWithEmail(email, password);
+    hideLoginModal();
+  } catch (error) {
+    alert('Error al iniciar sesión: ' + error.message);
+  }
+}
+
+async function handleLogout() {
+  if (confirm('¿Cerrar sesión? Tus libros seguirán guardados en este dispositivo.')) {
+    await FirebaseSync.signOut();
+  }
 }
 
 // Render the entire bookshelf
@@ -245,6 +283,14 @@ function setupEventListeners() {
       document.getElementById('modal-sync').classList.add('hidden');
     }
   });
+  
+  // Login modal
+  document.getElementById('login-close').addEventListener('click', hideLoginModal);
+  document.getElementById('modal-login').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modal-login')) hideLoginModal();
+  });
+  document.getElementById('btn-google-login').addEventListener('click', handleGoogleLogin);
+  document.getElementById('form-email-login').addEventListener('submit', handleEmailLogin);
   
   // Sync mode buttons
   document.querySelectorAll('.btn-sync-mode').forEach(btn => {
@@ -708,6 +754,12 @@ async function handleAddBook(e) {
       
       await db.updateBook(existingBook);
       window._editingBookId = null;
+      
+      // Sync to Firebase if logged in
+      if (FirebaseSync.isLoggedIn()) {
+        FirebaseSync.saveBook(existingBook);
+      }
+      
       closeModal();
       await renderBookshelf();
       return;
@@ -727,7 +779,13 @@ async function handleAddBook(e) {
     shelf: 'default'
   };
   
-  await db.addBook(book);
+  const savedBook = await db.addBook(book);
+  
+  // Sync to Firebase if logged in
+  if (FirebaseSync.isLoggedIn() && savedBook) {
+    FirebaseSync.saveBook(savedBook);
+  }
+  
   closeModal();
   await renderBookshelf();
 }
@@ -791,6 +849,12 @@ async function editBook(id) {
 async function deleteBook(id) {
   if (confirm('¿Eliminar este libro de la estantería?')) {
     await db.deleteBook(id);
+    
+    // Sync to Firebase if logged in
+    if (FirebaseSync.isLoggedIn()) {
+      FirebaseSync.deleteBook(id);
+    }
+    
     await renderBookshelf();
   }
 }

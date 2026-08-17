@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bookshelf-v1';
+const CACHE_NAME = 'bookshelf-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   '/app.js',
   '/db.js',
   '/sync.js',
+  '/firebase-sync.js',
   '/manifest.json'
 ];
 
