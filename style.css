@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
 :root {
   --shelf-bg: #2c1810;
   --shelf-light: #4a2c1a;
