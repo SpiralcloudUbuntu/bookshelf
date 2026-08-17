@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Mi Estantería</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header>
+    <h1>📚 Mi Estantería</h1>
+    <div class="header-actions">
+      <button id="btn-add" class="btn-primary">+ Añadir libro</button>
+      <button id="btn-filter" class="btn-secondary">Todos</button>
+      <button id="btn-sync" class="btn-icon" title="Sincronizar con Obsidian">🔄</button>
+      <button id="btn-settings" class="btn-icon" title="Ajustes">⚙️</button>
+    </div>
+  </header>
+
+  <main id="bookshelf-container">
+    <div id="empty-state" class="empty-state">
+      <p>Tu estantería está vacía</p>
+      <button id="btn-add-empty" class="btn-primary">Añadir tu primer libro</button>
+    </div>
+    <div id="bookshelf" class="bookshelf"></div>
+  </main>
+
+  <!-- Modal: Añadir libro -->
+  <div id="modal-add" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Añadir libro</h2>
+        <button class="btn-close" id="modal-close">✕</button>
+      </div>
+      <form id="form-add-book">
+        <!-- Scan ISBN button -->
+        <div class="form-group">
+          <button type="button" id="btn-scan-isbn" class="btn-scan">
+            <span class="scan-icon">📷</span>
+            <span>Escanear código de barras</span>
+          </button>
+        </div>
+
+        <div class="divider"><span>o rellena manualmente</span></div>
+
+        <div class="form-group">
+          <label for="book-isbn">ISBN</label>
+          <input type="text" id="book-isbn" placeholder="978-0-000-00000-0">
+        </div>
+        <div class="form-group">
+          <label for="book-title">Título *</label>
+          <input type="text" id="book-title" required placeholder="Título del libro">
+        </div>
+        <div class="form-group">
+          <label for="book-author">Autor</label>
+          <input type="text" id="book-author" placeholder="Autor">
+        </div>
+        <div class="form-group">
+          <label for="book-color">Color del lomo</label>
+          <input type="color" id="book-color" value="#8B4513">
+        </div>
+        <div class="form-group">
+          <label for="book-cover">Portada (URL o subir imagen)</label>
+          <input type="url" id="book-cover-url" placeholder="https://...">
+          <input type="file" id="book-cover-file" accept="image/*">
+          <div id="cover-preview" class="cover-preview"></div>
+        </div>
+        <div class="form-group">
+          <label for="book-spine">Foto del lomo (opcional)</label>
+          <div class="photo-buttons">
+            <button type="button" id="btn-capture-spine" class="btn-photo">📷 Fotografiar lomo</button>
+            <input type="file" id="book-spine-file" accept="image/*" style="display:none">
+            <button type="button" id="btn-upload-spine" class="btn-photo secondary">📁 Subir imagen</button>
+          </div>
+          <div id="spine-preview" class="spine-preview"></div>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <div class="status-buttons">
+            <button type="button" class="btn-status active" data-status="read">✅ Leído</button>
+            <button type="button" class="btn-status" data-status="reading">📖 Leyendo</button>
+            <button type="button" class="btn-status" data-status="tbr">📋 Por leer</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Orientación en estantería</label>
+          <div class="orientation-buttons">
+            <button type="button" class="btn-orientation active" data-orientation="spine">📏 Lomo</button>
+            <button type="button" class="btn-orientation" data-orientation="cover">🖼️ Portada</button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="btn-cancel">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Book action sheet (mobile-friendly) -->
+  <div id="book-actionsheet" class="action-sheet hidden">
+    <div class="action-sheet-content">
+      <div class="action-sheet-header">
+        <h3 id="action-sheet-title">Libro</h3>
+        <span id="action-sheet-author" class="action-sheet-author"></span>
+      </div>
+      <div class="action-sheet-buttons">
+        <button id="action-toggle-view" class="action-btn">📏 Cambiar a portada</button>
+        <button id="action-edit" class="action-btn">✏️ Editar</button>
+        <button id="action-delete" class="action-btn danger">🗑️ Eliminar</button>
+      </div>
+      <button id="action-cancel" class="action-btn cancel">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Modal: Scanner -->
+  <div id="modal-scanner" class="modal hidden">
+    <div class="modal-content scanner-modal">
+      <div class="modal-header">
+        <h2>Escanear ISBN</h2>
+        <button class="btn-close" id="scanner-close">✕</button>
+      </div>
+      <div id="scanner-container">
+        <div id="scanner-video"></div>
+        <div class="scanner-overlay">
+          <div class="scanner-frame"></div>
+          <p class="scanner-hint">Apunta al código de barras del libro</p>
+        </div>
+      </div>
+      <div id="scanner-result" class="scanner-result hidden">
+        <p id="scanner-result-text"></p>
+      </div>
+      <div class="scanner-manual">
+        <label>O introduce el ISBN manualmente:</label>
+        <div class="scanner-manual-input">
+          <input type="text" id="scanner-manual-isbn" placeholder="978...">
+          <button type="button" id="btn-manual-isbn" class="btn-primary">Buscar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Loading -->
+  <div id="modal-loading" class="modal hidden">
+    <div class="modal-content loading-modal">
+      <div class="spinner"></div>
+      <p id="loading-text">Buscando libro...</p>
+    </div>
+  </div>
+
+  <!-- Modal: Camera / Crop -->
+  <div id="modal-camera" class="modal hidden">
+    <div class="modal-content camera-modal">
+      <div class="modal-header">
+        <h2 id="camera-title">Fotografiar lomo</h2>
+        <button class="btn-close" id="camera-close">✕</button>
+      </div>
+      <div id="camera-container">
+        <video id="camera-video" autoplay playsinline></video>
+        <canvas id="camera-canvas" class="hidden"></canvas>
+        <div id="crop-overlay" class="hidden">
+          <div class="crop-wrapper">
+            <canvas id="crop-canvas"></canvas>
+            <div id="crop-rect" class="crop-rect">
+              <div class="crop-handle crop-handle-tl"></div>
+              <div class="crop-handle crop-handle-tr"></div>
+              <div class="crop-handle crop-handle-bl"></div>
+              <div class="crop-handle crop-handle-br"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="camera-actions">
+        <button type="button" id="btn-capture" class="btn-primary">📸 Capturar</button>
+        <button type="button" id="btn-recapture" class="btn-secondary hidden">🔄 Repetir</button>
+        <button type="button" id="btn-crop-confirm" class="btn-primary hidden">✅ Usar recorte</button>
+      </div>
+      <p class="camera-hint">Enmarca el lomo del libro y pulsa Capturar</p>
+    </div>
+  </div>
+
+  <!-- Modal: Sync -->
+
+  <!-- Modal: Settings -->
+  <div id="modal-settings" class="modal hidden">
+    <div class="modal-content settings-modal">
+      <div class="modal-header">
+        <h2>⚙️ Ajustes</h2>
+        <button class="btn-close" id="settings-close">✕</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>🪵 Estilo de estantería</h3>
+        <div class="theme-grid">
+          <button class="theme-btn active" data-theme="dark-wood" title="Madera oscura">
+            <div class="theme-preview" style="background: linear-gradient(to bottom, #4a2c1a, #2c1810); border-top: 3px solid #1a0e08;"></div>
+            <span>Madera oscura</span>
+          </button>
+          <button class="theme-btn" data-theme="light-wood" title="Madera clara">
+            <div class="theme-preview" style="background: linear-gradient(to bottom, #c4a57b, #a0845c); border-top: 3px solid #8b7355;"></div>
+            <span>Madera clara</span>
+          </button>
+          <button class="theme-btn" data-theme="white" title="Blanco">
+            <div class="theme-preview" style="background: linear-gradient(to bottom, #f5f5f5, #e0e0e0); border-top: 3px solid #ccc;"></div>
+            <span>Blanco</span>
+          </button>
+          <button class="theme-btn" data-theme="black" title="Negro">
+            <div class="theme-preview" style="background: linear-gradient(to bottom, #333, #1a1a1a); border-top: 3px solid #000;"></div>
+            <span>Negro</span>
+          </button>
+          <button class="theme-btn" data-theme="industrial" title="Industrial">
+            <div class="theme-preview" style="background: linear-gradient(to bottom, #555, #3a3a3a); border-top: 3px solid #2a2a2a;"></div>
+            <span>Industrial</span>
+          </button>
+          <button class="theme-btn" data-theme="vintage" title="Vintage">
+            <div class="theme-preview" style="background: linear-gradient(to bottom, #6b4c3b, #4a3328); border-top: 3px solid #3a2518;"></div>
+            <span>Vintage</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>📚 Libros por estantería</h3>
+        <div class="slider-container">
+          <input type="range" id="setting-books-per-shelf" min="4" max="20" value="12" class="slider">
+          <span id="books-per-shelf-value" class="slider-value">12</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>🎨 Color de fondo</h3>
+        <div class="color-options">
+          <button class="color-btn active" data-bg="#1a1a2e" style="background:#1a1a2e" title="Azul oscuro"></button>
+          <button class="color-btn" data-bg="#0d1117" style="background:#0d1117" title="GitHub dark"></button>
+          <button class="color-btn" data-bg="#1e1e2e" style="background:#1e1e2e" title="Catppuccin"></button>
+          <button class="color-btn" data-bg="#2b2b2b" style="background:#2b2b2b" title="Gris oscuro"></button>
+          <button class="color-btn" data-bg="#f5f0eb" style="background:#f5f0eb; border:1px solid #ccc" title="Crema"></button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>🌱 Decoración</h3>
+        <div class="decoration-toggles">
+          <label class="toggle-label">
+            <input type="checkbox" id="setting-show-plants" checked>
+            <span>Plantas decorativas</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="setting-show-bookends">
+            <span>Tentetiesos</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <button type="button" id="btn-settings-reset" class="btn-secondary">🔄 Restaurar por defecto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Sync -->
+  <div id="modal-sync" class="modal hidden">
+    <div class="modal-content sync-modal">
+      <div class="modal-header">
+        <h2>🔄 Sincronización</h2>
+        <button class="btn-close" id="sync-close">✕</button>
+      </div>
+      
+      <div class="sync-section">
+        <h3>Modo de sincronización</h3>
+        <div class="sync-mode-buttons">
+          <button type="button" class="btn-sync-mode active" data-mode="manual">📋 Manual</button>
+          <button type="button" class="btn-sync-mode" data-mode="api">🔌 Obsidian API</button>
+        </div>
+      </div>
+
+      <!-- Manual mode -->
+      <div id="sync-manual" class="sync-section">
+        <p class="sync-desc">Exporta tus libros como archivos .md que puedes guardar en tu vault de Obsidian, o importa archivos .md desde tu vault.</p>
+        <div class="sync-actions">
+          <button type="button" id="btn-sync-export" class="btn-primary">📤 Exportar a .md</button>
+          <button type="button" id="btn-sync-import" class="btn-secondary">📥 Importar .md</button>
+          <input type="file" id="sync-import-file" accept=".md" multiple style="display:none">
+        </div>
+      </div>
+
+      <!-- API mode -->
+      <div id="sync-api" class="sync-section hidden">
+        <p class="sync-desc">Conecta con el plugin <strong>Obsidian Local REST API</strong> para sincronización automática.</p>
+        <div class="form-group">
+          <label>URL del API</label>
+          <input type="url" id="sync-api-url" placeholder="http://127.0.0.1:27123" value="http://127.0.0.1:27123">
+        </div>
+        <div class="form-group">
+          <label>API Key (del plugin)</label>
+          <input type="text" id="sync-api-key" placeholder="Tu API key">
+        </div>
+        <div class="form-group">
+          <label>Carpeta en el vault</label>
+          <input type="text" id="sync-vault-path" placeholder="Libros/Estanteria" value="Libros/Estanteria">
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="sync-auto"> Sincronizar automáticamente
+          </label>
+        </div>
+        <div class="sync-actions">
+          <button type="button" id="btn-sync-test" class="btn-secondary">🔌 Probar conexión</button>
+          <button type="button" id="btn-sync-save" class="btn-primary">💾 Guardar config</button>
+        </div>
+        <div id="sync-status" class="sync-status"></div>
+      </div>
+
+      <!-- Sync actions -->
+      <div class="sync-section sync-bottom">
+        <div class="sync-actions">
+          <button type="button" id="btn-sync-push" class="btn-primary">📤 App → Obsidian</button>
+          <button type="button" id="btn-sync-pull" class="btn-secondary">📥 Obsidian → App</button>
+        </div>
+        <p class="sync-last" id="sync-last">Última sync: nunca</p>
+      </div>
+    </div>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="db.js"></script>
+  <script src="sync.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
