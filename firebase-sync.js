@@ -220,15 +220,17 @@ const FirebaseSync = {
     const userInfo = document.getElementById('user-info');
     const userName = document.getElementById('user-name');
 
+    console.log('updateUI called, user:', this.user ? this.user.email : 'null');
+
     if (this.user) {
-      if (loginBtn) loginBtn.classList.add('hidden');
-      if (logoutBtn) logoutBtn.classList.remove('hidden');
-      if (userInfo) userInfo.classList.remove('hidden');
+      if (loginBtn) { loginBtn.classList.add('hidden'); loginBtn.style.display = 'none'; }
+      if (logoutBtn) { logoutBtn.classList.remove('hidden'); logoutBtn.style.display = ''; }
+      if (userInfo) { userInfo.classList.remove('hidden'); userInfo.style.display = ''; }
       if (userName) userName.textContent = this.user.displayName || this.user.email;
     } else {
-      if (loginBtn) loginBtn.classList.remove('hidden');
-      if (logoutBtn) logoutBtn.classList.add('hidden');
-      if (userInfo) userInfo.classList.add('hidden');
+      if (loginBtn) { loginBtn.classList.remove('hidden'); loginBtn.style.display = ''; }
+      if (logoutBtn) { logoutBtn.classList.add('hidden'); logoutBtn.style.display = 'none'; }
+      if (userInfo) { userInfo.classList.add('hidden'); userInfo.style.display = 'none'; }
     }
   },
 
