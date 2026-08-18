@@ -775,6 +775,15 @@ async function handleAddBook(e) {
       if (coverImage) existingBook.coverImage = coverImage;
       if (spineImage) existingBook.spineImage = spineImage;
       
+      // Metadata from scan
+      const form = document.getElementById('form-add-book');
+      if (form.dataset.publisher) existingBook.publisher = form.dataset.publisher;
+      if (form.dataset.publishDate) existingBook.publishDate = form.dataset.publishDate;
+      if (form.dataset.pages) existingBook.pages = form.dataset.pages;
+      if (form.dataset.language) existingBook.language = form.dataset.language;
+      if (form.dataset.genre) existingBook.genre = form.dataset.genre;
+      if (form.dataset.description) existingBook.description = form.dataset.description;
+      
       await db.updateBook(existingBook);
       window._editingBookId = null;
       
@@ -790,6 +799,8 @@ async function handleAddBook(e) {
   }
   
   // Create new book
+  const form = document.getElementById('form-add-book');
+  
   const book = {
     title,
     author,
@@ -799,7 +810,14 @@ async function handleAddBook(e) {
     spineImage,
     status,
     orientation,
-    shelf: 'default'
+    shelf: 'default',
+    // Metadata from scan
+    publisher: form.dataset.publisher || null,
+    publishDate: form.dataset.publishDate || null,
+    pages: form.dataset.pages || null,
+    language: form.dataset.language || null,
+    genre: form.dataset.genre || null,
+    description: form.dataset.description || null
   };
   
   const savedBook = await db.addBook(book);
@@ -1027,74 +1045,174 @@ async function manualISBNSearch() {
 async function fetchBookByISBN(isbn) {
   try {
     console.log('Fetching ISBN:', isbn);
+    
+    // Try Open Library first
+    const olData = await fetchFromOpenLibrary(isbn);
+    if (olData) {
+      hideLoading();
+      showMetadataPreview(olData, isbn);
+      return;
+    }
+    
+    // Fallback: Google Books
+    const gData = await fetchFromGoogleBooks(isbn);
+    if (gData) {
+      hideLoading();
+      showMetadataPreview(gData, isbn);
+      return;
+    }
+    
+    // Nothing found
+    hideLoading();
+    document.getElementById('book-isbn').value = isbn;
+    console.log('No metadata found for ISBN:', isbn);
+    
+  } catch (error) {
+    console.error('Fetch error:', error);
+    hideLoading();
+    document.getElementById('book-isbn').value = isbn;
+  }
+}
+
+// Fetch from Open Library
+async function fetchFromOpenLibrary(isbn) {
+  try {
     const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
-    console.log('Response status:', response.status);
     const data = await response.json();
-    console.log('Data received:', data);
     const bookKey = `ISBN:${isbn}`;
     
-    if (data[bookKey]) {
-      const bookData = data[bookKey];
-      console.log('Book found:', bookData.title);
-      
-      // Fill form with fetched data
-      hideLoading();
-      document.getElementById('book-title').value = bookData.title || '';
-      document.getElementById('book-author').value = bookData.authors ? bookData.authors.map(a => a.name).join(', ') : '';
-      document.getElementById('book-isbn').value = isbn;
-      
-      // Auto-download cover image
-      let coverUrl = null;
-      if (bookData.cover) {
-        coverUrl = bookData.cover.large || bookData.cover.medium || bookData.cover.small;
-      }
-      
-      // Fallback: try Open Library covers API
-      if (!coverUrl) {
-        coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-      }
-      
-      if (coverUrl) {
-        document.getElementById('book-cover-url').value = coverUrl;
-        showPreview('cover-preview', coverUrl);
-        
-        // Auto-download cover as data URL for offline use
-        try {
-          const imgResponse = await fetch(coverUrl);
-          if (imgResponse.ok) {
-            const blob = await imgResponse.blob();
-            const reader = new FileReader();
-            reader.onload = () => {
-              window._capturedCoverImage = reader.result;
-              document.getElementById('book-cover-url').value = '';
-              showPreview('cover-preview', reader.result);
-            };
-            reader.readAsDataURL(blob);
-          }
-        } catch (imgErr) {
-          console.log('Could not download cover, using URL:', imgErr);
-          // Keep the URL as-is
-        }
-      }
-      
-      // Set orientation to cover since we have one
-      document.querySelectorAll('.btn-orientation').forEach(b => b.classList.remove('active'));
-      document.querySelector('.btn-orientation[data-orientation="cover"]').classList.add('active');
-      
-    } else {
-      console.log('Not found in primary API, trying alternative...');
-      await fetchBookByISBNAlternative(isbn);
+    if (!data[bookKey]) return null;
+    
+    const book = data[bookKey];
+    
+    // Get additional details from the work page
+    let pages = null;
+    let genres = [];
+    let description = null;
+    let publisher = null;
+    let publishDate = null;
+    let language = null;
+    
+    if (book.number_of_pages) pages = book.number_of_pages;
+    if (book.publishers && book.publishers.length > 0) publisher = book.publishers[0].name || book.publishers[0];
+    if (book.publish_date) publishDate = book.publish_date;
+    if (book.subjects) genres = book.subjects.slice(0, 5).map(s => typeof s === 'string' ? s : s.name || '');
+    
+    // Try to get language
+    if (book.languages && book.languages.length > 0) {
+      const langKey = book.languages[0].key;
+      language = langKey.split('/').pop();
     }
-  } catch (error) {
-    console.error('Open Library error:', error);
-    try {
-      await fetchBookByISBNAlternative(isbn);
-    } catch (err2) {
-      console.error('Alternative also failed:', err2);
-      hideLoading();
-      document.getElementById('book-isbn').value = isbn;
+    
+    // Cover URL
+    let coverUrl = null;
+    if (book.cover) {
+      coverUrl = book.cover.large || book.cover.medium || book.cover.small;
     }
+    if (!coverUrl) {
+      coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+    }
+    
+    return {
+      title: book.title || null,
+      author: book.authors ? book.authors.map(a => a.name).join(', ') : null,
+      coverUrl,
+      publisher,
+      publishDate,
+      pages,
+      language,
+      genres: genres.filter(g => g),
+      description,
+      isbn,
+      source: 'Open Library'
+    };
+  } catch (e) {
+    console.error('Open Library error:', e);
+    return null;
   }
+}
+
+// Fetch from Google Books
+async function fetchFromGoogleBooks(isbn) {
+  try {
+    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    const data = await response.json();
+    
+    if (!data.items || data.items.length === 0) return null;
+    
+    const info = data.items[0].volumeInfo;
+    
+    return {
+      title: info.title || null,
+      author: info.authors ? info.authors.join(', ') : null,
+      coverUrl: info.imageLinks ? (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail) : null,
+      publisher: info.publisher || null,
+      publishDate: info.publishedDate || null,
+      pages: info.pageCount || null,
+      language: info.language || null,
+      genres: info.categories || [],
+      description: info.description || null,
+      isbn,
+      source: 'Google Books'
+    };
+  } catch (e) {
+    console.error('Google Books error:', e);
+    return null;
+  }
+}
+
+// Show metadata preview for user confirmation
+function showMetadataPreview(meta, isbn) {
+  // Fill form fields, but DON'T overwrite manually edited fields
+  const form = document.getElementById('form-add-book');
+  
+  // Only fill empty fields (don't overwrite manual edits)
+  const titleField = document.getElementById('book-title');
+  if (!titleField.value.trim() && meta.title) titleField.value = meta.title;
+  
+  const authorField = document.getElementById('book-author');
+  if (!authorField.value.trim() && meta.author) authorField.value = meta.author;
+  
+  const isbnField = document.getElementById('book-isbn');
+  if (!isbnField.value.trim()) isbnField.value = isbn;
+  
+  // New fields - store in data attributes for later
+  if (meta.publisher) form.dataset.publisher = meta.publisher;
+  if (meta.publishDate) form.dataset.publishDate = meta.publishDate;
+  if (meta.pages) form.dataset.pages = meta.pages;
+  if (meta.language) form.dataset.language = meta.language;
+  if (meta.genres && meta.genres.length > 0) form.dataset.genre = meta.genres[0];
+  if (meta.description) form.dataset.description = meta.description;
+  
+  // Auto-download cover
+  if (meta.coverUrl) {
+    document.getElementById('book-cover-url').value = meta.coverUrl;
+    showPreview('cover-preview', meta.coverUrl);
+    
+    // Download as data URL for offline
+    fetch(meta.coverUrl)
+      .then(r => r.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          window._capturedCoverImage = reader.result;
+          document.getElementById('book-cover-url').value = '';
+          showPreview('cover-preview', reader.result);
+        };
+        reader.readAsDataURL(blob);
+      })
+      .catch(() => console.log('Could not download cover'));
+  }
+  
+  // Set orientation to cover if we have one
+  if (meta.coverUrl) {
+    document.querySelectorAll('.btn-orientation').forEach(b => b.classList.remove('active'));
+    document.querySelector('.btn-orientation[data-orientation="cover"]').classList.add('active');
+  }
+  
+  // Show metadata source
+  const sourceEl = document.getElementById('metadata-source');
+  if (sourceEl) sourceEl.textContent = `Datos de: ${meta.source}`;
 }
 
 async function fetchBookByISBNAlternative(isbn) {
@@ -1252,6 +1370,35 @@ async function showBookDetail(bookId) {
     isbnRow.classList.add('hidden');
   }
   
+  const pagesRow = document.getElementById('detail-pages-row');
+  const pagesEl = document.getElementById('detail-pages');
+  if (book.pages) {
+    pagesEl.textContent = book.pages;
+    pagesRow.classList.remove('hidden');
+  } else {
+    pagesRow.classList.add('hidden');
+  }
+  
+  // New metadata fields
+  const publisherRow = document.getElementById('detail-publisher-row');
+  const publisherEl = document.getElementById('detail-publisher');
+  if (book.publisher) {
+    publisherEl.textContent = book.publisher;
+    publisherRow.classList.remove('hidden');
+  } else {
+    publisherRow.classList.add('hidden');
+  }
+  
+  const languageRow = document.getElementById('detail-language-row');
+  const languageEl = document.getElementById('detail-language');
+  if (book.language) {
+    const langNames = { spa: 'Español', eng: 'Inglés', fre: 'Francés', ger: 'Alemán', ita: 'Italiano', por: 'Portugués', jpn: 'Japonés' };
+    languageEl.textContent = langNames[book.language] || book.language;
+    languageRow.classList.remove('hidden');
+  } else {
+    languageRow.classList.add('hidden');
+  }
+  
   const genreRow = document.getElementById('detail-genre-row');
   const genreEl = document.getElementById('detail-genre');
   if (book.genre) {
@@ -1261,13 +1408,13 @@ async function showBookDetail(bookId) {
     genreRow.classList.add('hidden');
   }
   
-  const pagesRow = document.getElementById('detail-pages-row');
-  const pagesEl = document.getElementById('detail-pages');
-  if (book.pages) {
-    pagesEl.textContent = book.pages;
-    pagesRow.classList.remove('hidden');
+  const descriptionRow = document.getElementById('detail-description-row');
+  const descriptionEl = document.getElementById('detail-description');
+  if (book.description) {
+    descriptionEl.textContent = book.description;
+    descriptionRow.classList.remove('hidden');
   } else {
-    pagesRow.classList.add('hidden');
+    descriptionRow.classList.add('hidden');
   }
   
   const addedEl = document.getElementById('detail-added');
