@@ -147,19 +147,59 @@
     </div>
   </div>
 
-  <!-- Book action sheet (mobile-friendly) -->
-  <div id="book-actionsheet" class="action-sheet hidden">
-    <div class="action-sheet-content">
-      <div class="action-sheet-header">
-        <h3 id="action-sheet-title">Libro</h3>
-        <span id="action-sheet-author" class="action-sheet-author"></span>
+  <!-- Book detail sheet -->
+  <div id="book-detailsheet" class="action-sheet hidden">
+    <div class="detail-content">
+      <button id="detail-close" class="detail-close-btn">✕</button>
+      
+      <div class="detail-cover-area">
+        <div id="detail-cover" class="detail-cover"></div>
       </div>
-      <div class="action-sheet-buttons">
-        <button id="action-toggle-view" class="action-btn">📏 Cambiar a portada</button>
-        <button id="action-edit" class="action-btn">✏️ Editar</button>
-        <button id="action-delete" class="action-btn danger">🗑️ Eliminar</button>
+      
+      <div class="detail-info">
+        <h2 id="detail-title" class="detail-title"></h2>
+        <p id="detail-author" class="detail-author"></p>
+        
+        <div id="detail-status" class="detail-status"></div>
+        
+        <div class="detail-meta">
+          <div id="detail-isbn-row" class="detail-meta-row hidden">
+            <span class="detail-meta-label">ISBN</span>
+            <span id="detail-isbn" class="detail-meta-value"></span>
+          </div>
+          <div id="detail-genre-row" class="detail-meta-row hidden">
+            <span class="detail-meta-label">Género</span>
+            <span id="detail-genre" class="detail-meta-value"></span>
+          </div>
+          <div id="detail-pages-row" class="detail-meta-row hidden">
+            <span class="detail-meta-label">Páginas</span>
+            <span id="detail-pages" class="detail-meta-value"></span>
+          </div>
+          <div id="detail-added-row" class="detail-meta-row">
+            <span class="detail-meta-label">Añadido</span>
+            <span id="detail-added" class="detail-meta-value"></span>
+          </div>
+        </div>
       </div>
-      <button id="action-cancel" class="action-btn cancel">Cancelar</button>
+      
+      <div class="detail-actions">
+        <button id="detail-change-status" class="detail-action-btn">
+          <span id="detail-status-icon">📖</span>
+          <span id="detail-status-text">Leyendo</span>
+        </button>
+        <button id="detail-toggle-view" class="detail-action-btn">
+          <span>📏</span>
+          <span>Lomo</span>
+        </button>
+        <button id="detail-edit" class="detail-action-btn">
+          <span>✏️</span>
+          <span>Editar</span>
+        </button>
+        <button id="detail-delete" class="detail-action-btn danger">
+          <span>🗑️</span>
+          <span>Eliminar</span>
+        </button>
+      </div>
     </div>
   </div>
 

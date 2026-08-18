@@ -1190,37 +1190,100 @@ function hideLoading() {
   document.getElementById('modal-loading').classList.add('hidden');
 }
 
-// Book action sheet (tap on book)
+// Book detail sheet (tap on book)
 let selectedBookId = null;
 
-function showBookActions(bookId) {
+async function showBookDetail(bookId) {
   selectedBookId = bookId;
   
-  // Find book data from DOM
-  const bookEl = document.querySelector(`[data-id="${bookId}"]`);
-  if (!bookEl) return;
+  const book = await db.getBook(bookId);
+  if (!book) return;
   
-  const titleEl = bookEl.querySelector('.spine-text, .book-title');
-  const authorEl = bookEl.querySelector('.book-author');
-  const title = titleEl?.textContent || 'Libro';
-  const author = authorEl?.textContent || '';
+  // Cover image
+  const coverEl = document.getElementById('detail-cover');
+  if (book.coverImage) {
+    coverEl.innerHTML = `<img src="${book.coverImage}" alt="${book.title}">`;
+  } else if (book.spineImage) {
+    coverEl.innerHTML = `<img src="${book.spineImage}" alt="${book.title}">`;
+  } else {
+    const color = book.color || generateBookColor(book.title);
+    coverEl.innerHTML = `<div class="detail-cover-placeholder" style="background:${color}; font-size:24px; color:white; padding:20px; text-align:center;">${book.title || ''}</div>`;
+  }
   
-  // Update action sheet content
-  document.getElementById('action-sheet-title').textContent = title;
-  document.getElementById('action-sheet-author').textContent = author;
+  // Title & author
+  document.getElementById('detail-title').textContent = book.title || 'Sin título';
+  document.getElementById('detail-author').textContent = book.author || '';
+  document.getElementById('detail-author').style.display = book.author ? '' : 'none';
   
-  // Update toggle button text based on current orientation
-  const isSpine = bookEl.classList.contains('book-spine');
-  document.getElementById('action-toggle-view').textContent = isSpine 
-    ? '🖼️ Cambiar a portada' 
-    : '📏 Cambiar a lomo';
+  // Status badge
+  const statusEl = document.getElementById('detail-status');
+  const statusMap = {
+    read: { label: '✅ Leído', class: 'status-read' },
+    reading: { label: '📖 Leyendo', class: 'status-reading' },
+    tbr: { label: '📋 Por leer', class: 'status-tbr' }
+  };
+  const status = statusMap[book.status] || statusMap.read;
+  statusEl.className = `detail-status ${status.class}`;
+  statusEl.textContent = status.label;
   
-  // Show action sheet
-  document.getElementById('book-actionsheet').classList.remove('hidden');
+  // Status change button
+  const nextStatus = { read: 'reading', reading: 'tbr', tbr: 'read' };
+  const nextStatusInfo = {
+    reading: { icon: '📖', text: 'Marcar leyendo' },
+    tbr: { icon: '📋', text: 'Marcar por leer' },
+    read: { icon: '✅', text: 'Marcar leído' }
+  };
+  const next = nextStatus[book.status || 'read'];
+  document.getElementById('detail-status-icon').textContent = nextStatusInfo[next].icon;
+  document.getElementById('detail-status-text').textContent = nextStatusInfo[next].text;
+  
+  // Toggle view button
+  const isSpine = book.orientation === 'spine' || (!book.orientation && !book.coverImage);
+  document.getElementById('detail-toggle-view').querySelector('span:last-child').textContent = 
+    isSpine ? 'Ver portada' : 'Ver lomo';
+  
+  // Metadata
+  const isbnRow = document.getElementById('detail-isbn-row');
+  const isbnEl = document.getElementById('detail-isbn');
+  if (book.isbn) {
+    isbnEl.textContent = book.isbn;
+    isbnRow.classList.remove('hidden');
+  } else {
+    isbnRow.classList.add('hidden');
+  }
+  
+  const genreRow = document.getElementById('detail-genre-row');
+  const genreEl = document.getElementById('detail-genre');
+  if (book.genre) {
+    genreEl.textContent = book.genre;
+    genreRow.classList.remove('hidden');
+  } else {
+    genreRow.classList.add('hidden');
+  }
+  
+  const pagesRow = document.getElementById('detail-pages-row');
+  const pagesEl = document.getElementById('detail-pages');
+  if (book.pages) {
+    pagesEl.textContent = book.pages;
+    pagesRow.classList.remove('hidden');
+  } else {
+    pagesRow.classList.add('hidden');
+  }
+  
+  const addedEl = document.getElementById('detail-added');
+  if (book.createdAt) {
+    const d = new Date(book.createdAt);
+    addedEl.textContent = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  } else {
+    addedEl.textContent = 'Desconocido';
+  }
+  
+  // Show detail sheet
+  document.getElementById('book-detailsheet').classList.remove('hidden');
 }
 
-function hideBookActions() {
-  document.getElementById('book-actionsheet').classList.add('hidden');
+function hideBookDetail() {
+  document.getElementById('book-detailsheet').classList.add('hidden');
   selectedBookId = null;
 }
 
@@ -1246,43 +1309,65 @@ document.addEventListener('touchend', (e) => {
   
   const duration = Date.now() - actionTouchStart;
   
-  // Quick tap = show action sheet (not during drag)
+  // Quick tap = show detail sheet (not during drag)
   if (duration < 300 && !actionTouchMoved && !book.classList.contains('dragging')) {
     e.preventDefault();
-    showBookActions(book.dataset.id);
+    showBookDetail(book.dataset.id);
   }
 });
 
 // Mouse click handler for desktop
 document.addEventListener('click', (e) => {
   if (e.target.closest('.book-actions')) return;
+  if (e.target.closest('.detail-content')) return;
   if (e.target.closest('.action-sheet-content')) return;
   
   const book = e.target.closest('.book-spine, .book-cover');
   if (book) {
-    showBookActions(book.dataset.id);
+    showBookDetail(book.dataset.id);
   }
 });
 
-// Action sheet button handlers
-document.getElementById('action-toggle-view').addEventListener('click', () => {
-  if (selectedBookId) toggleView(selectedBookId);
-  hideBookActions();
+// Detail sheet button handlers
+document.getElementById('detail-close').addEventListener('click', hideBookDetail);
+document.getElementById('book-detailsheet').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('book-detailsheet')) hideBookDetail();
 });
 
-document.getElementById('action-edit').addEventListener('click', () => {
-  if (selectedBookId) editBook(selectedBookId);
-  hideBookActions();
+document.getElementById('detail-change-status').addEventListener('click', async () => {
+  if (!selectedBookId) return;
+  const book = await db.getBook(selectedBookId);
+  if (!book) return;
+  
+  const nextStatus = { read: 'reading', reading: 'tbr', tbr: 'read' };
+  book.status = nextStatus[book.status || 'read'];
+  await db.updateBook(book);
+  
+  if (FirebaseSync.isLoggedIn()) FirebaseSync.saveBook(book);
+  
+  hideBookDetail();
+  await renderBookshelf();
 });
 
-document.getElementById('action-delete').addEventListener('click', () => {
-  if (selectedBookId) deleteBook(selectedBookId);
-  hideBookActions();
+document.getElementById('detail-toggle-view').addEventListener('click', async () => {
+  if (selectedBookId) {
+    await toggleView(selectedBookId);
+    hideBookDetail();
+  }
 });
 
-document.getElementById('action-cancel').addEventListener('click', hideBookActions);
-document.getElementById('book-actionsheet').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('book-actionsheet')) hideBookActions();
+document.getElementById('detail-edit').addEventListener('click', () => {
+  if (selectedBookId) {
+    hideBookDetail();
+    editBook(selectedBookId);
+  }
+});
+
+document.getElementById('detail-delete').addEventListener('click', () => {
+  if (selectedBookId) {
+    hideBookDetail();
+    deleteBook(selectedBookId);
+  }
 });
 const AppSettings = {
   theme: 'dark-wood',
