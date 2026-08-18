@@ -1,6 +1,7 @@
 // Main application
 const BOOKS_PER_SHELF = 12;
 let currentFilter = 'all';
+let currentSearch = '';
 let draggedBook = null;
 let draggedElement = null;
 
@@ -64,8 +65,25 @@ async function renderBookshelf() {
     books = await db.getBooksByStatus(currentFilter);
   }
   
+  // Apply search filter
+  if (currentSearch.trim()) {
+    const query = currentSearch.toLowerCase().trim();
+    books = books.filter(book => {
+      const title = (book.title || '').toLowerCase();
+      const author = (book.author || '').toLowerCase();
+      const isbn = (book.isbn || '').toLowerCase();
+      return title.includes(query) || author.includes(query) || isbn.includes(query);
+    });
+  }
+  
   if (books.length === 0) {
     bookshelf.innerHTML = '';
+    if (currentSearch.trim()) {
+      emptyState.innerHTML = `<p>No se encontraron libros para "<strong>${currentSearch}</strong>"</p>`;
+    } else {
+      emptyState.innerHTML = `<p>Tu estantería está vacía</p><button id="btn-add-empty" class="btn-primary">Añadir tu primer libro</button>`;
+      document.getElementById('btn-add-empty')?.addEventListener('click', openAddModal);
+    }
     emptyState.style.display = 'flex';
     return;
   }
@@ -194,6 +212,11 @@ function setupEventListeners() {
   
   // Filter button
   document.getElementById('btn-filter').addEventListener('click', cycleFilter);
+  
+  // Search
+  document.getElementById('btn-search').addEventListener('click', toggleSearch);
+  document.getElementById('search-input').addEventListener('input', handleSearch);
+  document.getElementById('search-clear').addEventListener('click', clearSearch);
   
   // Scan ISBN button
   document.getElementById('btn-scan-isbn').addEventListener('click', openScanner);
@@ -868,6 +891,31 @@ function cycleFilter() {
   
   currentFilter = filters[nextIndex];
   document.getElementById('btn-filter').textContent = labels[nextIndex];
+  renderBookshelf();
+}
+
+// Search
+function toggleSearch() {
+  const searchBar = document.getElementById('search-bar');
+  const searchInput = document.getElementById('search-input');
+  
+  if (searchBar.classList.contains('hidden')) {
+    searchBar.classList.remove('hidden');
+    searchInput.focus();
+  } else {
+    searchBar.classList.add('hidden');
+    clearSearch();
+  }
+}
+
+function handleSearch() {
+  currentSearch = document.getElementById('search-input').value;
+  renderBookshelf();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  currentSearch = '';
   renderBookshelf();
 }
 
