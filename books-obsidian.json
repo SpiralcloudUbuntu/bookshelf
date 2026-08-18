@@ -1,0 +1,986 @@
+[
+  {
+    "title": "Disidencia controlada",
+    "author": "Samuel Vázquez Álvarez",
+    "status": "read",
+    "genre": "Ensayo político",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Las cenizas de Babilonia",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#6"
+  },
+  {
+    "title": "Las puertas de Abadón",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#3"
+  },
+  {
+    "title": "Juegos de Nemesis",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#5"
+  },
+  {
+    "title": "La quema de Cibola",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#4"
+  },
+  {
+    "title": "La guerra de Calibán",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#2"
+  },
+  {
+    "title": "La ira de Tiamat",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#8"
+  },
+  {
+    "title": "El despertar del Leviatán",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Dioses del riesgo",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#2.5"
+  },
+  {
+    "title": "La caída del Leviatán",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#9"
+  },
+  {
+    "title": "El ascenso de Persepolis",
+    "author": "James S.A. Corey",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "The Expanse",
+    "saga_order": "#7"
+  },
+  {
+    "title": "La casa",
+    "author": "Michael McDowell",
+    "status": "tbr",
+    "genre": "Terror sureño",
+    "saga": "Blackwater",
+    "saga_order": "#3"
+  },
+  {
+    "title": "La fortuna",
+    "author": "Michael McDowell",
+    "status": "tbr",
+    "genre": "Terror sureño",
+    "saga": "Blackwater",
+    "saga_order": "#5"
+  },
+  {
+    "title": "La riada",
+    "author": "Michael McDowell",
+    "status": "read",
+    "genre": "Terror sureño",
+    "saga": "Blackwater",
+    "saga_order": "#1"
+  },
+  {
+    "title": "La guerra",
+    "author": "Michael McDowell",
+    "status": "tbr",
+    "genre": "Terror sureño",
+    "saga": "Blackwater",
+    "saga_order": "#4"
+  },
+  {
+    "title": "Lluvia",
+    "author": "Michael McDowell",
+    "status": "tbr",
+    "genre": "Terror sureño",
+    "saga": "Blackwater",
+    "saga_order": "#6"
+  },
+  {
+    "title": "El dique",
+    "author": "Michael McDowell",
+    "status": "read",
+    "genre": "Terror sureño",
+    "saga": "Blackwater",
+    "saga_order": "#2"
+  },
+  {
+    "title": "Por si las voces vuelven",
+    "author": "Ángel Martín",
+    "status": "read",
+    "genre": "Autoayuda / Testimonio",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Detrás del ruido",
+    "author": "Ángel Martín",
+    "status": "read",
+    "genre": "Autoayuda / Testimonio",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Proyecto Hail Mary",
+    "author": "Andy Weir",
+    "status": "read",
+    "genre": "Ciencia ficción hard",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Un mundo feliz",
+    "author": "Aldous Huxley",
+    "status": "read",
+    "genre": "Ciencia ficción",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "A tres metros sobre el cielo",
+    "author": "Federico Moccia",
+    "status": "read",
+    "genre": "Romance juvenil",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El libro de Estopa",
+    "author": "Jordi Bianciotto",
+    "status": "read",
+    "genre": "Biografía musical",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La sombra del viento",
+    "author": "Carlos Ruiz Zafón",
+    "status": "tbr",
+    "genre": "Novela",
+    "saga": "El cementerio de los libros olvidados",
+    "saga_order": "#1"
+  },
+  {
+    "title": "El príncipe de la niebla",
+    "author": "Carlos Ruiz Zafón",
+    "status": "tbr",
+    "genre": "Novela juvenil",
+    "saga": "Trilogía de la Niebla",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Los girasoles ciegos",
+    "author": "Alberto Méndez",
+    "status": "read",
+    "genre": "Relatos",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El arte de la guerra",
+    "author": "Sun Tzu",
+    "status": "read",
+    "genre": "Estrategia militar",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Final Fantasy IX - Guía argumental",
+    "author": "Chris Herraiz",
+    "status": "read",
+    "genre": "Videojuegos",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El cielo es real",
+    "author": "Todd Burpo",
+    "status": "read",
+    "genre": "Testimonio religioso",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Ronda de suspiros",
+    "author": "Juan Farías",
+    "status": "read",
+    "genre": "Poesía",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Hyperion",
+    "author": "Dan Simmons",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Los Cantos de Hyperion",
+    "saga_order": "1"
+  },
+  {
+    "title": "Una velada en la librería Morisaki",
+    "author": "Satoshi Yagisawa",
+    "status": "read",
+    "genre": "Novela contemporánea",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Mis días en la librería Morisaki",
+    "author": "Satoshi Yagisawa",
+    "status": "read",
+    "genre": "Novela contemporánea",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Algunos hombres buenos",
+    "author": "Quico Alsedo",
+    "status": "read",
+    "genre": "Ensayo social",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Hábitos atómicos",
+    "author": "James Clear",
+    "status": "read",
+    "genre": "Autoayuda",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La chica de nieve",
+    "author": "Javier Castillo",
+    "status": "tbr",
+    "genre": "Thriller",
+    "saga": "Javier Castillo (standalone)",
+    "saga_order": "Javier Castillo (standalone)"
+  },
+  {
+    "title": "El día que se perdió la cordura",
+    "author": "Javier Castillo",
+    "status": "read",
+    "genre": "Thriller",
+    "saga": "Javier Castillo (standalone)",
+    "saga_order": "Javier Castillo (standalone)"
+  },
+  {
+    "title": "El juego del alma",
+    "author": "Javier Castillo",
+    "status": "tbr",
+    "genre": "Thriller",
+    "saga": "Javier Castillo (standalone)",
+    "saga_order": "Javier Castillo (standalone)"
+  },
+  {
+    "title": "El día que se perdió el amor",
+    "author": "Javier Castillo",
+    "status": "read",
+    "genre": "Thriller",
+    "saga": "Javier Castillo (standalone)",
+    "saga_order": "Javier Castillo (standalone)"
+  },
+  {
+    "title": "Nunca",
+    "author": "Ken Follett",
+    "status": "read",
+    "genre": "Thriller",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Liberalismo",
+    "author": "Juan Ramón Rallo",
+    "status": "read",
+    "genre": "Ensayo político",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El viejo y el mar",
+    "author": "Ernest Hemingway",
+    "status": "tbr",
+    "genre": "Novela corta",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Los ojos de plata",
+    "author": "Scott Cawthon",
+    "status": "read",
+    "genre": "Terror",
+    "saga": "Five Nights at Freddy's",
+    "saga_order": "1"
+  },
+  {
+    "title": "La cara norte del corazón",
+    "author": "Dolores Redondo",
+    "status": "tbr",
+    "genre": "Novela negra",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Ofrenda a la tormenta",
+    "author": "Dolores Redondo",
+    "status": "tbr",
+    "genre": "Novela negra",
+    "saga": "Trilogía del Baztán",
+    "saga_order": "#3"
+  },
+  {
+    "title": "El guardián invisible",
+    "author": "Dolores Redondo",
+    "status": "tbr",
+    "genre": "Novela negra",
+    "saga": "Trilogía del Baztán",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Legado en los huesos",
+    "author": "Dolores Redondo",
+    "status": "tbr",
+    "genre": "Novela negra",
+    "saga": "Trilogía del Baztán",
+    "saga_order": "#2"
+  },
+  {
+    "title": "Julia reto a los dioses",
+    "author": "Santiago Posteguillo",
+    "status": "tbr",
+    "genre": "Novela histórica",
+    "saga": "Julia Domna",
+    "saga_order": "#2"
+  },
+  {
+    "title": "Yo Julia",
+    "author": "Santiago Posteguillo",
+    "status": "tbr",
+    "genre": "Novela histórica",
+    "saga": "Julia Domna",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Nacidos para correr",
+    "author": "Christopher McDougall",
+    "status": "read",
+    "genre": "Deportes",
+    "saga": "Christopher McDougall (standalone)",
+    "saga_order": "Christopher McDougall (standalone)"
+  },
+  {
+    "title": "Nacidos para ser héroes",
+    "author": "Christopher McDougall",
+    "status": "read",
+    "genre": "Deportes",
+    "saga": "Christopher McDougall (standalone)",
+    "saga_order": "Christopher McDougall (standalone)"
+  },
+  {
+    "title": "Ciudad de hueso",
+    "author": "Cassandra Clare",
+    "status": "read",
+    "genre": "Fantasía urbana",
+    "saga": "Cazadores de Sombras",
+    "saga_order": "1"
+  },
+  {
+    "title": "Harry Potter y la cámara de los secretos",
+    "author": "J.K. Rowling",
+    "status": "read",
+    "genre": "Fantasía juvenil",
+    "saga": "Harry Potter",
+    "saga_order": "2"
+  },
+  {
+    "title": "Harry Potter y la piedra filosofal",
+    "author": "J.K. Rowling",
+    "status": "read",
+    "genre": "Fantasía juvenil",
+    "saga": "Harry Potter",
+    "saga_order": "1"
+  },
+  {
+    "title": "Harry Potter y el prisionero de Azkaban",
+    "author": "J.K. Rowling",
+    "status": "read",
+    "genre": "Fantasía juvenil",
+    "saga": "Harry Potter",
+    "saga_order": "3"
+  },
+  {
+    "title": "Salem's Lot",
+    "author": "Stephen King",
+    "status": "read",
+    "genre": "Terror",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Carrie",
+    "author": "Stephen King",
+    "status": "read",
+    "genre": "Terror",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La historia de Lisey",
+    "author": "Stephen King",
+    "status": "tbr",
+    "genre": "Terror",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El pistolero",
+    "author": "Stephen King",
+    "status": "read",
+    "genre": "Fantasía oscura",
+    "saga": "La Torre Oscura",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Un saco de huesos",
+    "author": "Stephen King",
+    "status": "read",
+    "genre": "Terror",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La llegada de los tres",
+    "author": "Stephen King",
+    "status": "read",
+    "genre": "Fantasía oscura",
+    "saga": "La Torre Oscura",
+    "saga_order": "#3"
+  },
+  {
+    "title": "El extraño caso del Dr Jekyll y Mr Hyde",
+    "author": "Robert Louis Stevenson",
+    "status": "tbr",
+    "genre": "Novela gótica",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El principito",
+    "author": "Antoine de Saint-Exupéry",
+    "status": "read",
+    "genre": "Fábula",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El secreto de la asistenta",
+    "author": "Freida McFadden",
+    "status": "read",
+    "genre": "Thriller",
+    "saga": "La asistenta",
+    "saga_order": "2"
+  },
+  {
+    "title": "La asistenta",
+    "author": "Freida McFadden",
+    "status": "read",
+    "genre": "Thriller",
+    "saga": "La asistenta",
+    "saga_order": "1"
+  },
+  {
+    "title": "Ritos iguales",
+    "author": "Terry Pratchett",
+    "status": "read",
+    "genre": "Fantasía humorística",
+    "saga": "Mundodisco — Brujas",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Rechicero",
+    "author": "Terry Pratchett",
+    "status": "read",
+    "genre": "Fantasía humorística",
+    "saga": "Mundodisco",
+    "saga_order": "#3"
+  },
+  {
+    "title": "Mort",
+    "author": "Terry Pratchett",
+    "status": "read",
+    "genre": "Fantasía humorística",
+    "saga": "Mundodisco — Muerte",
+    "saga_order": "#1"
+  },
+  {
+    "title": "La luz fantástica",
+    "author": "Terry Pratchett",
+    "status": "read",
+    "genre": "Fantasía humorística",
+    "saga": "Mundodisco",
+    "saga_order": "#2"
+  },
+  {
+    "title": "¡Guardias! ¡Guardias!",
+    "author": "Terry Pratchett",
+    "status": "tbr",
+    "genre": "Fantasía humorística",
+    "saga": "Mundodisco — Guardia Nocturna",
+    "saga_order": "#1"
+  },
+  {
+    "title": "El color de la magia",
+    "author": "Terry Pratchett",
+    "status": "read",
+    "genre": "Fantasía humorística",
+    "saga": "Mundodisco",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Capítulo Dune",
+    "author": "Frank Herbert",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Dune",
+    "saga_order": "#6"
+  },
+  {
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Dune",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Los herejes de Dune",
+    "author": "Frank Herbert",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Dune",
+    "saga_order": "#5"
+  },
+  {
+    "title": "El mesías de Dune",
+    "author": "Frank Herbert",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Dune",
+    "saga_order": "#2"
+  },
+  {
+    "title": "Los hijos de Dune",
+    "author": "Frank Herbert",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Dune",
+    "saga_order": "#3"
+  },
+  {
+    "title": "El dios emperador de Dune",
+    "author": "Frank Herbert",
+    "status": "tbr",
+    "genre": "Ciencia ficción",
+    "saga": "Dune",
+    "saga_order": "#4"
+  },
+  {
+    "title": "Benjamin",
+    "author": "Federico Axat",
+    "status": "read",
+    "genre": "Psicología",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El muñeco de nieve",
+    "author": "Jo Nesbø",
+    "status": "tbr",
+    "genre": "Novela negra",
+    "saga": "Harry Hole",
+    "saga_order": "7"
+  },
+  {
+    "title": "El libro hueco",
+    "author": "Roberto Pineda",
+    "status": "tbr",
+    "genre": "Cómic / Guía de juegos",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Don't fuck the police",
+    "author": "Josema Vallejo",
+    "status": "read",
+    "genre": "Ensayo político",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Rebelión en la granja",
+    "author": "George Orwell",
+    "status": "read",
+    "genre": "Sátira política",
+    "saga": "George Orwell (standalone)",
+    "saga_order": "George Orwell (standalone)"
+  },
+  {
+    "title": "1984",
+    "author": "George Orwell",
+    "status": "read",
+    "genre": "Ciencia ficción",
+    "saga": "George Orwell (standalone)",
+    "saga_order": "George Orwell (standalone)"
+  },
+  {
+    "title": "Lecturas. 1 Primaria. Papelo",
+    "author": "María Josefa Pedro-Viejo",
+    "status": "read",
+    "genre": "Infantil",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Aleación de Ley",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía western",
+    "saga": "Nacidos de la Bruma (Mistborn) - Era 2",
+    "saga_order": "4"
+  },
+  {
+    "title": "El Héroe de las Eras",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "Nacidos de la Bruma — Era 1",
+    "saga_order": "#3"
+  },
+  {
+    "title": "El Imperio Final",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "Nacidos de la Bruma — Era 1",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Alomante Jak y los pozos de Eltania",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "Nacidos de la Bruma",
+    "saga_order": "#4.5"
+  },
+  {
+    "title": "Trenza del Mar Esmeralda",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "Nacidos de la Bruma (Mistborn) - Era 2 (spin-off)",
+    "saga_order": "6"
+  },
+  {
+    "title": "Elantris",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Brazales de duelo",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "Nacidos de la Bruma — Era 2 (Wax & Wayne)",
+    "saga_order": "#3"
+  },
+  {
+    "title": "Estelar",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Ciencia ficción",
+    "saga": "Skyward",
+    "saga_order": "#2"
+  },
+  {
+    "title": "El alma del emperador",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía / Fábula",
+    "saga": "",
+    "saga_order": "#1"
+  },
+  {
+    "title": "El Pozo de la Ascensión",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "Nacidos de la Bruma — Era 1",
+    "saga_order": "#2"
+  },
+  {
+    "title": "Desafiante",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Ciencia ficción",
+    "saga": "Skyward",
+    "saga_order": "#4"
+  },
+  {
+    "title": "El metal perdido",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "Nacidos de la Bruma — Era 2 (Wax & Wayne)",
+    "saga_order": "#4"
+  },
+  {
+    "title": "Escuadrón",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Ciencia ficción",
+    "saga": "Skyward",
+    "saga_order": "#1"
+  },
+  {
+    "title": "El Camino de los Reyes",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "El Archivo de las Tormentas (The Stormlight Archive)",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Citónica",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Ciencia ficción",
+    "saga": "Skyward",
+    "saga_order": "#3"
+  },
+  {
+    "title": "Historia secreta",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "Nacidos de la Bruma (Mistborn) - Era 1",
+    "saga_order": "#3.5"
+  },
+  {
+    "title": "El aliento de los dioses",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Sombras de Identidad",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía western / Misterio",
+    "saga": "Nacidos de la Bruma (Mistborn) - Era 2",
+    "saga_order": "5"
+  },
+  {
+    "title": "Palabras Radiantes",
+    "author": "Brandon Sanderson",
+    "status": "reading",
+    "genre": "Fantasía épica",
+    "saga": "El Archivo de las Tormentas (The Stormlight Archive)",
+    "saga_order": "#2"
+  },
+  {
+    "title": "La esperanza de Elantris",
+    "author": "Brandon Sanderson",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "",
+    "saga_order": "2"
+  },
+  {
+    "title": "El último deseo",
+    "author": "Andrzej Sapkowski",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "Geralt de Rivia",
+    "saga_order": "#1"
+  },
+  {
+    "title": "La espada del destino",
+    "author": "Andrzej Sapkowski",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "Geralt de Rivia",
+    "saga_order": "#2"
+  },
+  {
+    "title": "El temor de un hombre sabio",
+    "author": "Patrick Rothfuss",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "Crónica del asesino de reyes",
+    "saga_order": "#2"
+  },
+  {
+    "title": "El estrecho sendero entre deseos",
+    "author": "Patrick Rothfuss",
+    "status": "read",
+    "genre": "Fantasía",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La música del silencio",
+    "author": "Patrick Rothfuss",
+    "status": "read",
+    "genre": "Fantasía / Poesía",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "El nombre del viento",
+    "author": "Patrick Rothfuss",
+    "status": "read",
+    "genre": "Fantasía épica",
+    "saga": "Crónica del asesino de reyes",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Patria",
+    "author": "Fernando Aramburu",
+    "status": "tbr",
+    "genre": "Novela",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La última estrella",
+    "author": "Rick Yancey",
+    "status": "tbr",
+    "genre": "Ciencia ficción juvenil",
+    "saga": "La quinta ola",
+    "saga_order": "#3"
+  },
+  {
+    "title": "El mar infinito",
+    "author": "Rick Yancey",
+    "status": "tbr",
+    "genre": "Ciencia ficción juvenil",
+    "saga": "La quinta ola",
+    "saga_order": "#2"
+  },
+  {
+    "title": "La quinta ola",
+    "author": "Rick Yancey",
+    "status": "tbr",
+    "genre": "Ciencia ficción juvenil",
+    "saga": "La quinta ola",
+    "saga_order": "#1"
+  },
+  {
+    "title": "El principio del fin",
+    "author": "Manel Loureiro",
+    "status": "read",
+    "genre": "Terror",
+    "saga": "Apocalipsis Z",
+    "saga_order": "1"
+  },
+  {
+    "title": "La Ilíada",
+    "author": "Homero",
+    "status": "read",
+    "genre": "Poesía épica",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La catedral del mar",
+    "author": "Ildefonso Falcones",
+    "status": "read",
+    "genre": "Novela histórica",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "La divina comedia",
+    "author": "Dante Alighieri",
+    "status": "tbr",
+    "genre": "Poesía épica",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Rey blanco",
+    "author": "Juan Gómez-Jurado",
+    "status": "tbr",
+    "genre": "Thriller",
+    "saga": "Antonia Scott",
+    "saga_order": "#3"
+  },
+  {
+    "title": "Reina roja",
+    "author": "Juan Gómez-Jurado",
+    "status": "tbr",
+    "genre": "Thriller",
+    "saga": "Antonia Scott",
+    "saga_order": "#1"
+  },
+  {
+    "title": "Loba negra",
+    "author": "Juan Gómez-Jurado",
+    "status": "tbr",
+    "genre": "Thriller",
+    "saga": "Antonia Scott",
+    "saga_order": "#2"
+  },
+  {
+    "title": "El médico perplejo",
+    "author": "Robert S. Bobrow",
+    "status": "read",
+    "genre": "Divulgación científica",
+    "saga": "",
+    "saga_order": ""
+  },
+  {
+    "title": "Invicto",
+    "author": "Marcos Vázquez",
+    "status": "tbr",
+    "genre": "Autoayuda / Salud",
+    "saga": "",
+    "saga_order": ""
+  }
+]

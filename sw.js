@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bookshelf-v3';
+const CACHE_NAME = 'bookshelf-v4';
 const ASSETS = [
   '/bookshelf/',
   '/bookshelf/index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   '/bookshelf/db.js',
   '/bookshelf/sync.js',
   '/bookshelf/firebase-sync.js',
+  '/bookshelf/bulk-import.js',
   '/bookshelf/manifest.json'
 ];
 

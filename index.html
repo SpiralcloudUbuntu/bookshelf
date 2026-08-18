@@ -414,6 +414,22 @@
         <div id="sync-status" class="sync-status"></div>
       </div>
 
+      <!-- Import from Obsidian JSON -->
+      <div class="sync-section">
+        <h3>📥 Importar desde Obsidian</h3>
+        <p class="sync-desc">Importa todos los libros de tu vault de Obsidian con portadas automáticas.</p>
+        <div class="sync-actions">
+          <button type="button" id="btn-import-obsidian" class="btn-primary">📥 Importar libros de Obsidian</button>
+          <input type="file" id="import-obsidian-file" accept=".json" style="display:none">
+        </div>
+        <div id="import-progress" class="import-progress hidden">
+          <div class="import-bar">
+            <div id="import-bar-fill" class="import-bar-fill"></div>
+          </div>
+          <p id="import-status" class="import-status"></p>
+        </div>
+      </div>
+
       <!-- Sync actions -->
       <div class="sync-section sync-bottom">
         <div class="sync-actions">
@@ -432,6 +448,7 @@
   <script src="db.js"></script>
   <script src="sync.js"></script>
   <script src="firebase-sync.js"></script>
+  <script src="bulk-import.js"></script>
   <script src="app.js"></script>
   <script>
     // Register Service Worker for PWA

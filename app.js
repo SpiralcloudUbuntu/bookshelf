@@ -322,6 +322,48 @@ function setupEventListeners() {
   document.getElementById('btn-google-login').addEventListener('click', handleGoogleLogin);
   document.getElementById('form-email-login').addEventListener('submit', handleEmailLogin);
   
+  // Import from Obsidian
+  document.getElementById('btn-import-obsidian').addEventListener('click', () => {
+    document.getElementById('import-obsidian-file').click();
+  });
+  
+  document.getElementById('import-obsidian-file').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const books = await BulkImport.loadFromFile(file);
+    if (books.length === 0) {
+      alert('No se encontraron libros en el archivo.');
+      return;
+    }
+    
+    if (!confirm(`Se importarán ${books.length} libros con portadas automáticas. ¿Continuar?`)) {
+      return;
+    }
+    
+    const progressEl = document.getElementById('import-progress');
+    const barEl = document.getElementById('import-bar-fill');
+    const statusEl = document.getElementById('import-status');
+    
+    progressEl.classList.remove('hidden');
+    
+    const result = await BulkImport.importAll((progress) => {
+      const pct = Math.round((progress.current / progress.total) * 100);
+      barEl.style.width = pct + '%';
+      statusEl.textContent = progress.done 
+        ? `✅ ${progress.imported} importados, ${progress.failed} fallos`
+        : `${progress.current}/${progress.total} — ${progress.title}`;
+    });
+    
+    await renderBookshelf();
+    
+    setTimeout(() => {
+      progressEl.classList.add('hidden');
+    }, 5000);
+    
+    e.target.value = '';
+  });
+  
   // Sync mode buttons
   document.querySelectorAll('.btn-sync-mode').forEach(btn => {
     btn.addEventListener('click', () => {
