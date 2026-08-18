@@ -2,6 +2,7 @@
 const BOOKS_PER_SHELF = 12;
 let currentFilter = 'all';
 let currentSearch = '';
+let currentSort = 'added';
 let draggedBook = null;
 let draggedElement = null;
 
@@ -75,6 +76,9 @@ async function renderBookshelf() {
       return title.includes(query) || author.includes(query) || isbn.includes(query);
     });
   }
+  
+  // Apply sorting
+  books = sortBooks(books, currentSort);
   
   if (books.length === 0) {
     bookshelf.innerHTML = '';
@@ -212,6 +216,9 @@ function setupEventListeners() {
   
   // Filter button
   document.getElementById('btn-filter').addEventListener('click', cycleFilter);
+  
+  // Sort button
+  document.getElementById('btn-sort').addEventListener('click', cycleSort);
   
   // Search
   document.getElementById('btn-search').addEventListener('click', toggleSearch);
@@ -909,6 +916,37 @@ function cycleFilter() {
   
   currentFilter = filters[nextIndex];
   document.getElementById('btn-filter').textContent = labels[nextIndex];
+  renderBookshelf();
+}
+
+// Sort
+function sortBooks(books, sortBy) {
+  const sorted = [...books];
+  
+  switch (sortBy) {
+    case 'title-asc':
+      return sorted.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    case 'title-desc':
+      return sorted.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+    case 'author':
+      return sorted.sort((a, b) => (a.author || '').localeCompare(b.author || ''));
+    case 'added':
+      return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    case 'added-old':
+      return sorted.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+    default:
+      return sorted;
+  }
+}
+
+function cycleSort() {
+  const sorts = ['added', 'added-old', 'title-asc', 'title-desc', 'author'];
+  const labels = ['Recientes', 'Antiguos', 'A-Z', 'Z-A', 'Autor'];
+  const currentIndex = sorts.indexOf(currentSort);
+  const nextIndex = (currentIndex + 1) % sorts.length;
+  
+  currentSort = sorts[nextIndex];
+  document.getElementById('btn-sort').textContent = '↕️ ' + labels[nextIndex];
   renderBookshelf();
 }
 
