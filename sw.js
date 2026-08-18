@@ -1,13 +1,13 @@
-const CACHE_NAME = 'bookshelf-v2';
+const CACHE_NAME = 'bookshelf-v3';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/db.js',
-  '/sync.js',
-  '/firebase-sync.js',
-  '/manifest.json'
+  '/bookshelf/',
+  '/bookshelf/index.html',
+  '/bookshelf/style.css',
+  '/bookshelf/app.js',
+  '/bookshelf/db.js',
+  '/bookshelf/sync.js',
+  '/bookshelf/firebase-sync.js',
+  '/bookshelf/manifest.json'
 ];
 
 // Install — cache all assets

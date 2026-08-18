@@ -2,7 +2,7 @@
   "name": "Mi Estantería",
   "short_name": "Estantería",
   "description": "Tu biblioteca personal visual — escanea, organiza y colecciona",
-  "start_url": "/",
+  "start_url": "/bookshelf/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
