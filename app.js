@@ -225,6 +225,28 @@ function setupEventListeners() {
   document.getElementById('search-input').addEventListener('input', handleSearch);
   document.getElementById('search-clear').addEventListener('click', clearSearch);
   
+  // Title search
+  document.getElementById('btn-title-search').addEventListener('click', searchByTitle);
+  document.getElementById('book-title-search').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); searchByTitle(); }
+  });
+  
+  // Cover selector modal
+  document.getElementById('covers-close').addEventListener('click', () => {
+    document.getElementById('modal-covers').classList.add('hidden');
+  });
+  document.getElementById('modal-covers').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modal-covers')) {
+      document.getElementById('modal-covers').classList.add('hidden');
+    }
+  });
+  document.getElementById('btn-cover-none').addEventListener('click', () => {
+    window._capturedCoverImage = null;
+    document.getElementById('book-cover-url').value = '';
+    document.getElementById('cover-preview').innerHTML = '';
+    document.getElementById('modal-covers').classList.add('hidden');
+  });
+  
   // Scan ISBN button
   document.getElementById('btn-scan-isbn').addEventListener('click', openScanner);
   document.getElementById('scanner-close').addEventListener('click', closeScanner);
@@ -1121,6 +1143,138 @@ async function manualISBNSearch() {
   }
 }
 
+// Title search
+async function searchByTitle() {
+  const query = document.getElementById('book-title-search').value.trim();
+  if (!query || query.length < 2) return;
+  
+  const resultsEl = document.getElementById('title-search-results');
+  resultsEl.innerHTML = '<p style="padding:12px;text-align:center;color:rgba(255,255,255,0.5)">Buscando...</p>';
+  resultsEl.classList.remove('hidden');
+  
+  try {
+    let response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10&lang=spa`);
+    let data = await response.json();
+    
+    if (!data.docs || data.docs.length === 0) {
+      response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
+      data = await response.json();
+    }
+    
+    if (!data.docs || data.docs.length === 0) {
+      resultsEl.innerHTML = '<p style="padding:12px;text-align:center;color:rgba(255,255,255,0.5)">Sin resultados</p>';
+      return;
+    }
+    
+    resultsEl.innerHTML = data.docs.map(doc => {
+      const title = doc.title || 'Sin título';
+      const author = doc.author_name ? doc.author_name.join(', ') : '';
+      const year = doc.first_publish_year || '';
+      const coverId = doc.cover_i;
+      const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-S.jpg` : '';
+      const isbn = doc.isbn ? doc.isbn[0] : '';
+      
+      return `
+        <div class="search-result-item" data-title="${escapeHtml(title)}" data-author="${escapeHtml(author)}" data-year="${year}" data-isbn="${isbn}" data-cover-id="${coverId || ''}">
+          ${coverUrl ? `<img class="search-result-cover" src="${coverUrl}" alt="">` : '<div class="search-result-cover"></div>'}
+          <div class="search-result-info">
+            <div class="search-result-title">${escapeHtml(title)}</div>
+            <div class="search-result-author">${escapeHtml(author)}</div>
+            ${year ? `<div class="search-result-year">${year}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    resultsEl.querySelectorAll('.search-result-item').forEach(item => {
+      item.addEventListener('click', () => selectSearchResult(item));
+    });
+  } catch (err) {
+    console.error('Search error:', err);
+    resultsEl.innerHTML = '<p style="padding:12px;text-align:center;color:rgba(255,255,255,0.5)">Error</p>';
+  }
+}
+
+async function selectSearchResult(item) {
+  const title = item.dataset.title;
+  const author = item.dataset.author;
+  const isbn = item.dataset.isbn;
+  const coverId = item.dataset.coverId;
+  
+  document.getElementById('book-title').value = title;
+  document.getElementById('book-author').value = author;
+  if (isbn) document.getElementById('book-isbn').value = isbn;
+  
+  document.getElementById('title-search-results').classList.add('hidden');
+  document.getElementById('book-title-search').value = '';
+  
+  // Fetch multiple covers and show selector
+  const covers = [];
+  if (coverId) {
+    covers.push({ url: `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`, label: 'Portada' });
+  }
+  if (isbn) {
+    covers.push({ url: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`, label: 'ISBN' });
+  }
+  
+  // Search for more editions
+  try {
+    const resp = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(title + ' ' + author)}&limit=8`);
+    const data = await resp.json();
+    if (data.docs) {
+      data.docs.forEach(doc => {
+        if (doc.cover_i) {
+          covers.push({ url: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`, label: doc.title || title });
+        }
+      });
+    }
+  } catch(e) {}
+  
+  // Deduplicate
+  const unique = [...new Map(covers.map(c => [c.url, c])).values()];
+  
+  if (unique.length > 0) {
+    showCoverSelector(unique);
+  }
+  
+  document.querySelectorAll('.btn-orientation').forEach(b => b.classList.remove('active'));
+  document.querySelector('.btn-orientation[data-orientation="cover"]').classList.add('active');
+}
+
+function showCoverSelector(covers) {
+  const grid = document.getElementById('covers-grid');
+  grid.innerHTML = covers.map((cover, i) => `
+    <div class="cover-option" data-url="${cover.url}">
+      <img src="${cover.url}" alt="${escapeHtml(cover.label)}" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="cover-option-label">${escapeHtml(cover.label)}</div>
+    </div>
+  `).join('');
+  
+  grid.querySelectorAll('.cover-option').forEach(option => {
+    option.addEventListener('click', async () => {
+      const url = option.dataset.url;
+      try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onload = () => {
+          window._capturedCoverImage = reader.result;
+          document.getElementById('book-cover-url').value = '';
+          showPreview('cover-preview', reader.result);
+          document.getElementById('modal-covers').classList.add('hidden');
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        document.getElementById('book-cover-url').value = url;
+        showPreview('cover-preview', url);
+        document.getElementById('modal-covers').classList.add('hidden');
+      }
+    });
+  });
+  
+  document.getElementById('modal-covers').classList.remove('hidden');
+}
+
 // Open Library API
 async function fetchBookByISBN(isbn) {
   try {
@@ -1242,7 +1396,7 @@ async function fetchFromGoogleBooks(isbn) {
 }
 
 // Show metadata preview for user confirmation
-function showMetadataPreview(meta, isbn) {
+async function showMetadataPreview(meta, isbn) {
   // Fill form fields, but DON'T overwrite manually edited fields
   const form = document.getElementById('form-add-book');
   
@@ -1266,22 +1420,31 @@ function showMetadataPreview(meta, isbn) {
   
   // Auto-download cover
   if (meta.coverUrl) {
-    document.getElementById('book-cover-url').value = meta.coverUrl;
-    showPreview('cover-preview', meta.coverUrl);
+    // Fetch multiple covers for the selector
+    const covers = [{ url: meta.coverUrl, label: meta.source || 'API' }];
     
-    // Download as data URL for offline
-    fetch(meta.coverUrl)
-      .then(r => r.blob())
-      .then(blob => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          window._capturedCoverImage = reader.result;
-          document.getElementById('book-cover-url').value = '';
-          showPreview('cover-preview', reader.result);
-        };
-        reader.readAsDataURL(blob);
-      })
-      .catch(() => console.log('Could not download cover'));
+    // Add alternative covers from Open Library
+    if (isbn) {
+      covers.push({ url: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`, label: 'ISBN' });
+      covers.push({ url: `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`, label: 'ISBN mediana' });
+    }
+    
+    // Search for more editions
+    try {
+      const resp = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(meta.title + ' ' + (meta.author || ''))}&limit=6`);
+      const data = await resp.json();
+      if (data.docs) {
+        data.docs.forEach(doc => {
+          if (doc.cover_i) {
+            covers.push({ url: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`, label: doc.title || meta.title });
+          }
+        });
+      }
+    } catch(e) {}
+    
+    // Deduplicate
+    const unique = [...new Map(covers.map(c => [c.url, c])).values()];
+    showCoverSelector(unique);
   }
   
   // Set orientation to cover if we have one
