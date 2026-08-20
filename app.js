@@ -1143,7 +1143,7 @@ async function manualISBNSearch() {
   }
 }
 
-// Title search
+// Title search - prioritizes Spanish editions
 async function searchByTitle() {
   const query = document.getElementById('book-title-search').value.trim();
   if (!query || query.length < 2) return;
@@ -1153,32 +1153,85 @@ async function searchByTitle() {
   resultsEl.classList.remove('hidden');
   
   try {
-    let response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10&lang=spa`);
-    let data = await response.json();
+    // Strategy 1: Search Open Library with language=spa
+    let allDocs = [];
     
-    if (!data.docs || data.docs.length === 0) {
-      response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
-      data = await response.json();
+    const resp1 = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=15&language=spa`);
+    const data1 = await resp1.json();
+    if (data1.docs) allDocs.push(...data1.docs);
+    
+    // Strategy 2: Search with " español" appended
+    const resp2 = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query + ' español')}&limit=10`);
+    const data2 = await resp2.json();
+    if (data2.docs) allDocs.push(...data2.docs);
+    
+    // Strategy 3: General search (fallback)
+    const resp3 = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
+    const data3 = await resp3.json();
+    if (data3.docs) allDocs.push(...data3.docs);
+    
+    // Strategy 4: Google Books API (better Spanish coverage)
+    const resp4 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=10&langRestrict=es`);
+    const data4 = await resp4.json();
+    if (data4.items) {
+      data4.items.forEach(item => {
+        const info = item.volumeInfo;
+        allDocs.push({
+          title: info.title,
+          author_name: info.authors,
+          first_publish_year: info.publishedDate ? info.publishedDate.substring(0, 4) : '',
+          cover_i: null,
+          isbn: info.industryIdentifiers ? info.industryIdentifiers.map(i => i.identifier) : [],
+          google_cover: info.imageLinks ? (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail) : null,
+          language: info.language
+        });
+      });
     }
     
-    if (!data.docs || data.docs.length === 0) {
+    if (allDocs.length === 0) {
       resultsEl.innerHTML = '<p style="padding:12px;text-align:center;color:rgba(255,255,255,0.5)">Sin resultados</p>';
       return;
     }
     
-    resultsEl.innerHTML = data.docs.map(doc => {
+    // Deduplicate by title+author, prioritize Spanish
+    const seen = new Set();
+    const unique = [];
+    allDocs.forEach(doc => {
+      const key = (doc.title || '').toLowerCase().substring(0, 30) + '|' + (doc.author_name ? doc.author_name[0] : '').toLowerCase().substring(0, 20);
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(doc);
+      }
+    });
+    
+    // Sort: Spanish language first, then by year
+    unique.sort((a, b) => {
+      const aLang = a.language || '';
+      const bLang = b.language || '';
+      const aIsEs = aLang.includes('spa') || aLang.includes('es') ? 0 : 1;
+      const bIsEs = bLang.includes('spa') || bLang.includes('es') ? 0 : 1;
+      if (aIsEs !== bIsEs) return aIsEs - bIsEs;
+      return (b.first_publish_year || 0) - (a.first_publish_year || 0);
+    });
+    
+    // Render top 10
+    const top = unique.slice(0, 10);
+    
+    resultsEl.innerHTML = top.map(doc => {
       const title = doc.title || 'Sin título';
-      const author = doc.author_name ? doc.author_name.join(', ') : '';
+      const author = doc.author_name ? (Array.isArray(doc.author_name) ? doc.author_name.join(', ') : doc.author_name) : '';
       const year = doc.first_publish_year || '';
       const coverId = doc.cover_i;
-      const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-S.jpg` : '';
-      const isbn = doc.isbn ? doc.isbn[0] : '';
+      const coverUrl = doc.google_cover || (coverId ? `https://covers.openlibrary.org/b/id/${coverId}-S.jpg` : '');
+      const isbn = doc.isbn ? (Array.isArray(doc.isbn) ? doc.isbn[0] : doc.isbn) : '';
+      const lang = doc.language || '';
+      const isSpanish = lang.includes('spa') || lang.includes('es');
       
       return `
-        <div class="search-result-item" data-title="${escapeHtml(title)}" data-author="${escapeHtml(author)}" data-year="${year}" data-isbn="${isbn}" data-cover-id="${coverId || ''}">
+        <div class="search-result-item" data-title="${escapeHtml(title)}" data-author="${escapeHtml(author)}" data-year="${year}" data-isbn="${isbn}" data-cover-id="${coverId || ''}" data-google-cover="${doc.google_cover || ''}">
           ${coverUrl ? `<img class="search-result-cover" src="${coverUrl}" alt="">` : '<div class="search-result-cover"></div>'}
           <div class="search-result-info">
-            <div class="search-result-title">${escapeHtml(title)}</div>
+            <div class="search-result-title">${escapeHtml(title)}${isSpanish ? ' 🇪🇸' : ''}</div>
             <div class="search-result-author">${escapeHtml(author)}</div>
             ${year ? `<div class="search-result-year">${year}</div>` : ''}
           </div>
@@ -1200,6 +1253,7 @@ async function selectSearchResult(item) {
   const author = item.dataset.author;
   const isbn = item.dataset.isbn;
   const coverId = item.dataset.coverId;
+  const googleCover = item.dataset.googleCover;
   
   document.getElementById('book-title').value = title;
   document.getElementById('book-author').value = author;
@@ -1210,9 +1264,8 @@ async function selectSearchResult(item) {
   
   // Fetch multiple covers and show selector
   const covers = [];
-  if (coverId) {
-    covers.push({ url: `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`, label: 'Portada' });
-  }
+  if (googleCover) covers.push({ url: googleCover, label: 'Google Books' });
+  if (coverId) covers.push({ url: `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`, label: 'Open Library' });
   if (isbn) {
     covers.push({ url: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`, label: 'ISBN' });
   }
