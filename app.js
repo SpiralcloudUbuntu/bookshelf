@@ -1792,6 +1792,108 @@ document.getElementById('detail-change-status').addEventListener('click', async 
   await renderBookshelf();
 });
 
+document.getElementById('detail-change-cover').addEventListener('click', async () => {
+  if (!selectedBookId) return;
+  const book = await db.getBook(selectedBookId);
+  if (!book) return;
+  
+  // Collect covers from different sources
+  const covers = [];
+  
+  if (book.coverImage && book.coverImage.startsWith('http')) {
+    covers.push({ url: book.coverImage, label: 'Actual' });
+  }
+  
+  if (book.isbn) {
+    covers.push({ url: `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`, label: 'ISBN' });
+  }
+  
+  // Search by title + author for more editions
+  try {
+    const query = encodeURIComponent((book.title || '') + ' ' + (book.author || ''));
+    const resp = await fetch(`https://openlibrary.org/search.json?q=${query}&limit=10`);
+    const data = await resp.json();
+    if (data.docs) {
+      data.docs.forEach(doc => {
+        if (doc.cover_i) {
+          covers.push({ url: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`, label: doc.title || book.title });
+        }
+      });
+    }
+  } catch(e) {}
+  
+  // Google Books
+  try {
+    const query = encodeURIComponent(book.title || '');
+    const resp = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=8&langRestrict=es`);
+    const data = await resp.json();
+    if (data.items) {
+      data.items.forEach(item => {
+        if (item.volumeInfo.imageLinks) {
+          const url = item.volumeInfo.imageLinks.thumbnail || item.volumeInfo.imageLinks.smallThumbnail;
+          if (url) covers.push({ url: url.replace('http:', 'https:'), label: item.volumeInfo.title || book.title });
+        }
+      });
+    }
+  } catch(e) {}
+  
+  // Deduplicate
+  const unique = [...new Map(covers.map(c => [c.url, c])).values()];
+  
+  if (unique.length === 0) {
+    alert('No se encontraron portadas para este libro.');
+    return;
+  }
+  
+  // Override showCoverSelector to save to existing book
+  const originalHandler = showCoverSelector;
+  showCoverSelector = function(coversList) {
+    const grid = document.getElementById('covers-grid');
+    grid.innerHTML = coversList.map(cover => `
+      <div class="cover-option" data-url="${cover.url}">
+        <img src="${cover.url}" alt="${escapeHtml(cover.label)}" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <div class="cover-option-label">${escapeHtml(cover.label)}</div>
+      </div>
+    `).join('');
+    
+    grid.querySelectorAll('.cover-option').forEach(option => {
+      option.addEventListener('click', async () => {
+        const url = option.dataset.url;
+        try {
+          const response = await fetch(url);
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onload = async () => {
+            // Save to existing book
+            book.coverImage = reader.result;
+            book.orientation = 'cover';
+            await db.updateBook(book);
+            if (FirebaseSync.isLoggedIn()) FirebaseSync.saveBook(book);
+            document.getElementById('modal-covers').classList.add('hidden');
+            hideBookDetail();
+            await renderBookshelf();
+            showCoverSelector = originalHandler; // Restore
+          };
+          reader.readAsDataURL(blob);
+        } catch (err) {
+          book.coverImage = url;
+          book.orientation = 'cover';
+          await db.updateBook(book);
+          if (FirebaseSync.isLoggedIn()) FirebaseSync.saveBook(book);
+          document.getElementById('modal-covers').classList.add('hidden');
+          hideBookDetail();
+          await renderBookshelf();
+          showCoverSelector = originalHandler;
+        }
+      });
+    });
+    
+    document.getElementById('modal-covers').classList.remove('hidden');
+  };
+  
+  showCoverSelector(unique);
+});
+
 document.getElementById('detail-toggle-view').addEventListener('click', async () => {
   if (selectedBookId) {
     await toggleView(selectedBookId);

@@ -1364,9 +1364,9 @@ main {
 
 .detail-actions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 16px 20px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 16px 16px;
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
