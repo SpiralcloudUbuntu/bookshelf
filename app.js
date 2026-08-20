@@ -1730,25 +1730,33 @@ function hideBookDetail() {
   selectedBookId = null;
 }
 
-// Touch handler for books
+// Touch handler for books - clean separation of tap vs drag
 let actionTouchStart = 0;
 let actionTouchMoved = false;
+let actionTouchBook = null;
 
 document.addEventListener('touchstart', (e) => {
   const book = e.target.closest('.book-spine, .book-cover');
   if (book) {
     actionTouchStart = Date.now();
     actionTouchMoved = false;
+    actionTouchBook = book;
+  } else {
+    actionTouchBook = null;
   }
 }, { passive: true });
 
 document.addEventListener('touchmove', (e) => {
-  actionTouchMoved = true;
+  // Only track movement if we started on a book
+  if (actionTouchBook) {
+    actionTouchMoved = true;
+  }
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
-  const book = e.target.closest('.book-spine, .book-cover');
-  if (!book) return;
+  if (!actionTouchBook) return;
+  const book = actionTouchBook;
+  actionTouchBook = null;
   
   const duration = Date.now() - actionTouchStart;
   
@@ -1845,54 +1853,51 @@ document.getElementById('detail-change-cover').addEventListener('click', async (
     return;
   }
   
-  // Override showCoverSelector to save to existing book
-  const originalHandler = showCoverSelector;
-  showCoverSelector = function(coversList) {
-    const grid = document.getElementById('covers-grid');
-    grid.innerHTML = coversList.map(cover => `
-      <div class="cover-option" data-url="${cover.url}">
-        <img src="${cover.url}" alt="${escapeHtml(cover.label)}" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="cover-option-label">${escapeHtml(cover.label)}</div>
-      </div>
-    `).join('');
-    
-    grid.querySelectorAll('.cover-option').forEach(option => {
-      option.addEventListener('click', async () => {
-        const url = option.dataset.url;
-        try {
-          const response = await fetch(url);
-          const blob = await response.blob();
-          const reader = new FileReader();
-          reader.onload = async () => {
-            // Save to existing book
-            book.coverImage = reader.result;
-            book.orientation = 'cover';
-            await db.updateBook(book);
-            if (FirebaseSync.isLoggedIn()) FirebaseSync.saveBook(book);
-            document.getElementById('modal-covers').classList.add('hidden');
-            hideBookDetail();
-            await renderBookshelf();
-            showCoverSelector = originalHandler; // Restore
-          };
-          reader.readAsDataURL(blob);
-        } catch (err) {
-          book.coverImage = url;
+  // Show cover selector with callback to save to existing book
+  showCoverSelectorForBook(unique, book);
+});
+
+// Cover selector for existing books (separate from new book flow)
+function showCoverSelectorForBook(covers, book) {
+  const grid = document.getElementById('covers-grid');
+  grid.innerHTML = covers.map(cover => `
+    <div class="cover-option" data-url="${cover.url}">
+      <img src="${cover.url}" alt="${escapeHtml(cover.label)}" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="cover-option-label">${escapeHtml(cover.label)}</div>
+    </div>
+  `).join('');
+  
+  grid.querySelectorAll('.cover-option').forEach(option => {
+    option.addEventListener('click', async () => {
+      const url = option.dataset.url;
+      try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onload = async () => {
+          book.coverImage = reader.result;
           book.orientation = 'cover';
           await db.updateBook(book);
           if (FirebaseSync.isLoggedIn()) FirebaseSync.saveBook(book);
           document.getElementById('modal-covers').classList.add('hidden');
           hideBookDetail();
           await renderBookshelf();
-          showCoverSelector = originalHandler;
-        }
-      });
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        book.coverImage = url;
+        book.orientation = 'cover';
+        await db.updateBook(book);
+        if (FirebaseSync.isLoggedIn()) FirebaseSync.saveBook(book);
+        document.getElementById('modal-covers').classList.add('hidden');
+        hideBookDetail();
+        await renderBookshelf();
+      }
     });
-    
-    document.getElementById('modal-covers').classList.remove('hidden');
-  };
+  });
   
-  showCoverSelector(unique);
-});
+  document.getElementById('modal-covers').classList.remove('hidden');
+}
 
 document.getElementById('detail-toggle-view').addEventListener('click', async () => {
   if (selectedBookId) {
